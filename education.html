@@ -90,12 +90,20 @@
                         <button id="login-button"
                             class="text-white hover:text-primary text-sm font-bold transition-colors">Login</button>
                         <div id="user-profile" class="hidden items-center gap-3">
+                            <div class="flex flex-col items-end">
+                                <button id="orders-button"
+                                    class="text-text-muted hover:text-primary text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">receipt_long</span> Orders
+                                </button>
+                                <button id="logout-button"
+                                    class="text-text-muted hover:text-red-400 text-[10px] font-bold uppercase tracking-widest transition-colors">
+                                    Logout
+                                </button>
+                            </div>
                             <div
                                 class="size-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary">
                                 <span class="material-symbols-outlined text-[18px]">person</span>
                             </div>
-                            <button id="logout-button"
-                                class="text-text-muted hover:text-red-400 text-xs transition-colors">Logout</button>
                         </div>
                     </div>
                     <button id="cart-button"
@@ -130,6 +138,29 @@
                 </div>
                 <button
                     class="w-full bg-primary hover:bg-primary/90 text-background-dark font-bold py-4 rounded-lg transition-all shadow-lg active:scale-[0.98]">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Drawer -->
+    <div id="orders-drawer" class="fixed inset-0 z-[120] hidden">
+        <div id="orders-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div id="orders-content"
+            class="absolute right-0 top-0 h-full w-full max-w-md bg-background-dark border-l border-[#2d4724] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300">
+            <div class="p-6 border-b border-[#2d4724] flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2 font-display">
+                    <span class="material-symbols-outlined text-primary">receipt_long</span>
+                    I Miei Ordini
+                </h3>
+                <button id="close-orders" class="text-text-muted hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="order-list" class="flex-grow overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                <div class="text-center py-20 text-text-muted font-display">
+                    <span class="material-symbols-outlined text-4xl mb-2">inbox</span>
+                    <p>Caricamento ordini...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -493,6 +524,61 @@
                 }
             } catch (err) { authMessage.textContent = err.message; authMessage.classList.add('text-red-400'); }
         });
+
+        // --- Orders Logic ---
+        const ordersDrawer = document.getElementById('orders-drawer');
+        const ordersContent = document.getElementById('orders-content');
+        const orderList = document.getElementById('order-list');
+
+        const openOrders = () => {
+            ordersDrawer.classList.remove('hidden');
+            setTimeout(() => ordersContent.classList.remove('translate-x-full'), 10);
+            fetchOrders();
+        };
+        const closeOrders = () => {
+            ordersContent.classList.add('translate-x-full');
+            setTimeout(() => ordersDrawer.classList.add('hidden'), 300);
+        };
+
+        async function fetchOrders() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+            orderList.innerHTML = `<div class="flex justify-center py-20"><div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div></div>`;
+            const { data: orders, error } = await supabase.from('orders').select(`id, total_amount, status, created_at, order_items (quantity, price_at_purchase, teas ( name ))`).order('created_at', { ascending: false });
+            if (error) { orderList.innerHTML = '<p class="text-red-400 text-center">Error loading orders.</p>'; return; }
+            if (!orders || orders.length === 0) { orderList.innerHTML = '<div class="text-center py-20 text-text-muted"><span class="material-symbols-outlined text-4xl mb-2">inbox</span><p>No orders found.</p></div>'; return; }
+            orderList.innerHTML = orders.map(order => `
+                <div class="bg-surface-dark/50 border border-[#2d4724] rounded-xl p-5 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div><p class="text-[10px] text-primary font-bold uppercase tracking-widest">Order #${order.id.slice(0, 8)}</p><p class="text-xs text-text-muted">${new Date(order.created_at).toLocaleDateString()}</p></div>
+                        <span class="px-2 py-1 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase">${order.status}</span>
+                    </div>
+                    <div class="space-y-2">${order.order_items.map(item => `<div class="flex justify-between text-sm"><span class="text-white">${item.quantity}x ${item.teas.name}</span><span class="text-text-muted">$${(item.quantity * item.price_at_purchase).toFixed(2)}</span></div>`).join('')}</div>
+                    <div class="pt-3 border-t border-[#2d4724] flex justify-between items-center"><span class="text-white font-bold">Total</span><span class="text-primary font-bold text-lg">$${order.total_amount.toFixed(2)}</span></div>
+                </div>
+            `).join('');
+        }
+
+        async function handleCheckout() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) { openAuth(); return; }
+            if (cart.length === 0) { alert('Cart is empty!'); return; }
+            const btn = document.querySelector('#cart-drawer button.bg-primary');
+            const original = btn.innerHTML; btn.disabled = true; btn.innerHTML = 'Processing...';
+            try {
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const { data: order, error } = await supabase.from('orders').insert([{ user_id: session.user.id, total_amount: total, status: 'completed' }]).select().single();
+                if (error) throw error;
+                await supabase.from('order_items').insert(cart.map(i => ({ order_id: order.id, tea_id: i.id, quantity: i.quantity, price_at_purchase: i.price })));
+                alert('Order placed successfully!'); cart = []; updateCartUI(); closeCart();
+            } catch (err) { alert(err.message); } finally { btn.disabled = false; btn.innerHTML = original; }
+        }
+
+        // Listeners Extension
+        document.getElementById('orders-button').addEventListener('click', openOrders);
+        document.getElementById('close-orders').addEventListener('click', closeOrders);
+        document.getElementById('orders-overlay').addEventListener('click', closeOrders);
+        document.querySelector('#cart-drawer button.bg-primary').addEventListener('click', handleCheckout);
 
         // Init
         updateCartUI();

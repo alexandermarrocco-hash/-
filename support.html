@@ -37,9 +37,9 @@
     <!-- Header (Shared) -->
     <header class="sticky top-0 z-50 w-full border-b border-[#2d4724]/50 bg-background-dark/80 backdrop-blur-md">
         <div class="px-4 md:px-8 xl:px-40 py-3 flex justify-between items-center">
-            <a class="flex items-center gap-3" href="index.html">
+            <a class="flex items-center gap-3 transition-transform hover:scale-105" href="index.html">
                 <span class="material-symbols-outlined !text-3xl text-primary">emoji_food_beverage</span>
-                <h2 class="text-xl font-bold">Tea Collective</h2>
+                <span class="text-xl font-bold tracking-tight">Tea Collective</span>
             </a>
             <nav class="hidden lg:flex items-center gap-8">
                 <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
@@ -50,13 +50,28 @@
                     href="sourcing.html">Sourcing</a>
             </nav>
             <div class="flex items-center gap-4">
-                <button id="login-button" class="text-white hover:text-primary text-sm font-bold">Login</button>
-                <div id="user-profile" class="hidden items-center gap-3">
-                    <span class="material-symbols-outlined text-primary">person</span>
-                    <button id="logout-button" class="text-text-muted hover:text-red-400 text-xs">Logout</button>
+                <div id="auth-ui" class="flex items-center gap-3 border-l border-[#2d4724]/50 pl-4">
+                    <button id="login-button"
+                        class="text-white hover:text-primary text-sm font-bold transition-colors">Login</button>
+                    <div id="user-profile" class="hidden items-center gap-3">
+                        <div class="flex flex-col items-end">
+                            <button id="orders-button"
+                                class="text-text-muted hover:text-primary text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">receipt_long</span> Orders
+                            </button>
+                            <button id="logout-button"
+                                class="text-text-muted hover:text-red-400 text-[10px] font-bold uppercase tracking-widest transition-colors">
+                                Logout
+                            </button>
+                        </div>
+                        <div
+                            class="size-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined text-[18px]">person</span>
+                        </div>
+                    </div>
                 </div>
                 <button id="cart-button"
-                    class="relative size-10 rounded-full bg-surface-dark flex items-center justify-center">
+                    class="relative size-10 rounded-full bg-surface-dark flex items-center justify-center hover:bg-[#2d4724] transition-colors">
                     <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
                     <span id="cart-badge"
                         class="absolute -top-1 -right-1 bg-primary text-background-dark text-[10px] font-bold rounded-full size-4 flex items-center justify-center">0</span>
@@ -64,6 +79,74 @@
             </div>
         </div>
     </header>
+
+    <!-- Cart Drawer -->
+    <div id="cart-drawer" class="fixed inset-0 z-[100] hidden">
+        <div id="cart-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div
+            class="absolute right-0 top-0 h-full w-full max-w-md bg-background-dark border-l border-[#2d4724] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300">
+            <div class="p-6 border-b border-[#2d4724] flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">shopping_bag</span> Carrello
+                </h3>
+                <button id="close-cart" class="text-text-muted hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-4"></div>
+            <div class="p-6 border-t border-[#2d4724] bg-surface-darker">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-text-muted">Totale</span>
+                    <span id="cart-total" class="text-2xl font-bold text-white">$0.00</span>
+                </div>
+                <button id="checkout-btn"
+                    class="w-full bg-primary hover:bg-primary/90 text-background-dark font-bold py-4 rounded-lg transition-all shadow-lg active:scale-[0.98]">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Drawer -->
+    <div id="orders-drawer" class="fixed inset-0 z-[120] hidden">
+        <div id="orders-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div id="orders-content"
+            class="absolute right-0 top-0 h-full w-full max-w-md bg-background-dark border-l border-[#2d4724] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300">
+            <div class="p-6 border-b border-[#2d4724] flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">receipt_long</span> I Miei Ordini
+                </h3>
+                <button id="close-orders" class="text-text-muted hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div id="order-list" class="flex-grow overflow-y-auto p-6 space-y-6"></div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4">
+        <div id="auth-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div id="auth-modal-content"
+            class="relative bg-surface-dark w-full max-w-md rounded-2xl overflow-hidden border border-primary/20 shadow-2xl p-8 transform scale-95 opacity-0 transition-all duration-300">
+            <button id="close-auth" class="absolute top-4 right-4 text-text-muted hover:text-white"><span
+                    class="material-symbols-outlined">close</span></button>
+            <div class="text-center mb-8">
+                <h3 id="auth-title" class="text-2xl font-bold text-white">Bentornato</h3>
+                <div id="auth-message" class="hidden mt-4 text-sm font-bold"></div>
+            </div>
+            <div class="flex bg-background-dark/50 p-1 rounded-lg mb-6">
+                <button id="tab-login"
+                    class="flex-grow py-2 rounded-md text-sm font-bold bg-primary text-background-dark">Login</button>
+                <button id="tab-register"
+                    class="flex-grow py-2 rounded-md text-sm font-bold text-text-muted">Registrati</button>
+            </div>
+            <form id="auth-form" class="space-y-4">
+                <input type="email" id="auth-email" placeholder="Email" required
+                    class="w-full bg-background-dark border border-[#2d4724] text-white px-4 py-3 rounded-lg outline-none focus:border-primary">
+                <input type="password" id="auth-password" placeholder="Password" required
+                    class="w-full bg-background-dark border border-[#2d4724] text-white px-4 py-3 rounded-lg outline-none focus:border-primary">
+                <button type="submit" id="auth-submit"
+                    class="w-full bg-primary text-background-dark font-bold py-3 rounded-lg hover:bg-primary/90 transition-colors">Accedi</button>
+            </form>
+        </div>
+    </div>
 
     <main class="flex-grow">
         <!-- Support Header -->
@@ -157,16 +240,127 @@
 
     <script type="module">
         import { supabase } from './supabaseClient.js';
+
+        let cart = JSON.parse(localStorage.getItem('tea-cart') || '[]');
         const cartBadge = document.getElementById('cart-badge');
+        const cartDrawer = document.getElementById('cart-drawer');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotalEl = document.getElementById('cart-total');
         const loginBtn = document.getElementById('login-button');
         const userProfile = document.getElementById('user-profile');
-        let cart = JSON.parse(localStorage.getItem('tea-cart') || '[]');
-        cartBadge.textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
+        const authModal = document.getElementById('auth-modal');
+        const authContent = document.getElementById('auth-modal-content');
+        const authForm = document.getElementById('auth-form');
+        const authMessage = document.getElementById('auth-message');
+        const authTitle = document.getElementById('auth-title');
+        const authSubmit = document.getElementById('auth-submit');
+        const authTabLogin = document.getElementById('tab-login');
+        const authTabRegister = document.getElementById('tab-register');
+        const ordersDrawer = document.getElementById('orders-drawer');
+        const ordersContent = document.getElementById('orders-content');
+        const orderList = document.getElementById('order-list');
+
+        function updateCartUI() {
+            localStorage.setItem('tea-cart', JSON.stringify(cart));
+            cartBadge.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotalEl.textContent = `$${total.toFixed(2)}`;
+            cartItemsContainer.innerHTML = cart.map(item => `
+                <div class="flex items-center gap-4 p-4 bg-surface-dark/50 rounded-xl border border-[#2d4724]">
+                    <div class="size-16 rounded-lg bg-cover bg-center" style="background-image: url('${item.image_url}')"></div>
+                    <div class="flex-grow">
+                        <h4 class="text-white font-bold text-sm">${item.name}</h4>
+                        <p class="text-primary font-bold">$${item.price.toFixed(2)}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="updateQty('${item.id}', -1)" class="text-text-muted hover:text-white"><span class="material-symbols-outlined">remove</span></button>
+                        <span class="text-white font-bold">${item.quantity}</span>
+                        <button onclick="updateQty('${item.id}', 1)" class="text-text-muted hover:text-white"><span class="material-symbols-outlined">add</span></button>
+                    </div>
+                </div>
+            `).join('');
+            if (cart.length === 0) cartItemsContainer.innerHTML = '<p class="text-center text-text-muted py-10">Il tuo carrello è vuoto.</p>';
+        }
+
+        window.updateQty = (id, delta) => {
+            const item = cart.find(i => i.id === id);
+            if (item) { item.quantity += delta; if (item.quantity <= 0) cart = cart.filter(i => i.id !== id); }
+            updateCartUI();
+        };
+
+        const openCart = () => { cartDrawer.classList.remove('hidden'); setTimeout(() => cartDrawer.querySelector('.transform').classList.remove('translate-x-full'), 10); };
+        const closeCart = () => { cartDrawer.querySelector('.transform').classList.add('translate-x-full'); setTimeout(() => cartDrawer.classList.add('hidden'), 300); };
+        const openAuth = () => { authModal.classList.remove('hidden'); setTimeout(() => authContent.classList.replace('scale-95', 'scale-100'), 10); authContent.classList.replace('opacity-0', 'opacity-100'); };
+        const closeAuth = () => { authContent.classList.replace('scale-100', 'scale-95'); authContent.classList.replace('opacity-100', 'opacity-0'); setTimeout(() => authModal.classList.add('hidden'), 300); };
+        const openOrders = () => { ordersDrawer.classList.remove('hidden'); setTimeout(() => ordersContent.classList.remove('translate-x-full'), 10); fetchOrders(); };
+        const closeOrders = () => { ordersContent.classList.add('translate-x-full'); setTimeout(() => ordersDrawer.classList.add('hidden'), 300); };
+
+        let authMode = 'login';
+        const switchAuthMode = (mode) => {
+            authMode = mode;
+            if (mode === 'login') { authTabLogin.classList.add('bg-primary', 'text-background-dark'); authTabRegister.classList.remove('bg-primary', 'text-background-dark'); authTitle.textContent = 'Bentornato'; authSubmit.textContent = 'Accedi'; }
+            else { authTabRegister.classList.add('bg-primary', 'text-background-dark'); authTabLogin.classList.remove('bg-primary', 'text-background-dark'); authTitle.textContent = 'Unisciti a noi'; authSubmit.textContent = 'Registrati'; }
+        };
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            authMessage.classList.remove('hidden'); authMessage.textContent = 'Processing...';
+            try {
+                if (authMode === 'login') { const { error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; closeAuth(); }
+                else { const { error } = await supabase.auth.signUp({ email, password }); if (error) throw error; authMessage.textContent = 'Check your email!'; }
+            } catch (err) { authMessage.textContent = err.message; authMessage.classList.add('text-red-400'); }
+        }
+
+        async function fetchOrders() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+            orderList.innerHTML = '<div class="flex justify-center py-20"><div class="animate-spin h-8 w-8 border-t-2 border-primary rounded-full"></div></div>';
+            const { data: orders, error } = await supabase.from('orders').select('id, total_amount, status, created_at, order_items(quantity, price_at_purchase, teas(name))').order('created_at', { ascending: false });
+            if (error) { orderList.innerHTML = '<p class="text-red-400 text-center">Error.</p>'; return; }
+            orderList.innerHTML = orders.map(o => `<div class="bg-surface-dark border border-[#2d4724] p-4 rounded-xl">
+                <p class="text-xs text-primary font-bold">#${o.id.slice(0, 8)} - ${new Date(o.created_at).toLocaleDateString()}</p>
+                <p class="text-sm text-white font-bold">$${o.total_amount.toFixed(2)} (${o.status})</p>
+            </div>`).join('') || '<p class="text-center text-text-muted py-10">Nessun ordine.</p>';
+        }
+
+        async function handleCheckout() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) { openAuth(); return; }
+            if (cart.length === 0) return;
+            const btn = document.getElementById('checkout-btn');
+            btn.disabled = true; btn.innerHTML = 'Processing...';
+            try {
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const { data: order, error } = await supabase.from('orders').insert([{ user_id: session.user.id, total_amount: total, status: 'completed' }]).select().single();
+                if (error) throw error;
+                await supabase.from('order_items').insert(cart.map(i => ({ order_id: order.id, tea_id: i.id, quantity: i.quantity, price_at_purchase: i.price })));
+                alert('Success!'); cart = []; updateCartUI(); closeCart();
+            } catch (err) { alert(err.message); } finally { btn.disabled = false; btn.innerHTML = 'Procedi al Checkout'; }
+        }
+
+        document.getElementById('cart-button').onclick = openCart;
+        document.getElementById('close-cart').onclick = closeCart;
+        document.getElementById('cart-overlay').onclick = closeCart;
+        document.getElementById('login-button').onclick = openAuth;
+        document.getElementById('close-auth').onclick = closeAuth;
+        document.getElementById('auth-overlay').onclick = closeAuth;
+        document.getElementById('tab-login').onclick = () => switchAuthMode('login');
+        document.getElementById('tab-register').onclick = () => switchAuthMode('register');
+        document.getElementById('auth-form').onsubmit = handleAuth;
+        document.getElementById('logout-button').onclick = () => supabase.auth.signOut();
+        document.getElementById('orders-button').onclick = openOrders;
+        document.getElementById('close-orders').onclick = closeOrders;
+        document.getElementById('orders-overlay').onclick = closeOrders;
+        document.getElementById('checkout-btn').onclick = handleCheckout;
+
         supabase.auth.onAuthStateChange((event, session) => {
             if (session) { loginBtn.classList.add('hidden'); userProfile.classList.replace('hidden', 'flex'); }
             else { loginBtn.classList.remove('hidden'); userProfile.classList.replace('flex', 'hidden'); }
         });
-        document.getElementById('logout-button').onclick = () => supabase.auth.signOut();
+
+        updateCartUI();
     </script>
 </body>
 

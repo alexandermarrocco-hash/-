@@ -123,14 +123,20 @@
                             Login
                         </button>
                         <div id="user-profile" class="hidden items-center gap-3">
+                            <div class="flex flex-col items-end">
+                                <button id="orders-button"
+                                    class="text-text-muted hover:text-primary text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">receipt_long</span> Orders
+                                </button>
+                                <button id="logout-button"
+                                    class="text-text-muted hover:text-red-400 text-[10px] font-bold uppercase tracking-widest transition-colors">
+                                    Logout
+                                </button>
+                            </div>
                             <div
                                 class="size-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary">
                                 <span class="material-symbols-outlined text-[18px]">person</span>
                             </div>
-                            <button id="logout-button"
-                                class="text-text-muted hover:text-red-400 text-xs transition-colors">
-                                Logout
-                            </button>
                         </div>
                     </div>
 
@@ -177,6 +183,30 @@
                     class="w-full bg-primary hover:bg-primary/90 text-background-dark font-bold py-4 rounded-lg transition-all shadow-lg active:scale-[0.98]">
                     Procedi al Checkout
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Drawer -->
+    <div id="orders-drawer" class="fixed inset-0 z-[120] hidden">
+        <div id="orders-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div id="orders-content"
+            class="absolute right-0 top-0 h-full w-full max-w-md bg-background-dark border-l border-[#2d4724] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300">
+            <div class="p-6 border-b border-[#2d4724] flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2 font-display">
+                    <span class="material-symbols-outlined text-primary">receipt_long</span>
+                    I Miei Ordini
+                </h3>
+                <button id="close-orders" class="text-text-muted hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="order-list" class="flex-grow overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                <!-- Orders will be injected here -->
+                <div class="text-center py-20 text-text-muted font-display">
+                    <span class="material-symbols-outlined text-4xl mb-2">inbox</span>
+                    <p>Nessun ordine trovato.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -273,10 +303,10 @@
                     in every cup.
                 </p>
                 <div class="mt-4 flex flex-col sm:flex-row gap-4">
-                    <button
-                        class="bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(76,230,25,0.3)]">
+                    <a href="#products"
+                        class="bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(76,230,25,0.3)] flex items-center justify-center">
                         Shop Rare Teas
-                    </button>
+                    </a>
                     <a href="sourcing.html"
                         class="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 font-medium py-3 px-8 rounded-lg transition-all flex items-center gap-2">
                         <span>Our Sourcing</span>
@@ -328,7 +358,8 @@
         <section id="products" class="px-4 md:px-8 xl:px-40 py-12 bg-background-dark">
             <div class="flex items-center justify-between mb-8">
                 <h2 class="text-3xl font-bold text-white tracking-tight">Rare Harvests</h2>
-                <a class="text-primary hover:text-primary/80 text-sm font-bold flex items-center gap-1" href="#">
+                <a class="text-primary hover:text-primary/80 text-sm font-bold flex items-center gap-1"
+                    href="#products">
                     View Collection <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
@@ -430,7 +461,7 @@
         <div class="px-4 md:px-8 xl:px-40">
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
                 <div class="col-span-2 lg:col-span-2">
-                    <a class="flex items-center gap-2 text-white mb-4" href="#">
+                    <a class="flex items-center gap-2 text-white mb-4" href="index.html">
                         <span class="material-symbols-outlined text-primary text-2xl">emoji_food_beverage</span>
                         <span class="text-xl font-bold">Tea Collective</span>
                     </a>
@@ -442,11 +473,11 @@
                 <div>
                     <h4 class="text-white font-bold mb-4">Shop</h4>
                     <ul class="space-y-2 text-sm text-text-muted">
-                        <li><a class="hover:text-primary transition-colors" href="#">Oolong</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">Puerh</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">Green Tea</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">White Tea</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="#">Teaware</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#products">Oolong</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#products">Puerh</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#products">Green Tea</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#products">White Tea</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#products">Teaware</a></li>
                     </ul>
                 </div>
                 <div>
@@ -477,11 +508,11 @@
                 <p class="text-text-muted text-xs">© 2024 Tea Collective. All rights reserved.</p>
                 <div class="flex gap-4">
                     <!-- Social Icons placeholders using material symbols for simplicity in this context, usually would use SVGs -->
-                    <a class="text-text-muted hover:text-white" href="#"><span
+                    <a class="text-text-muted hover:text-white" href="index.html"><span
                             class="material-symbols-outlined text-lg">public</span></a>
-                    <a class="text-text-muted hover:text-white" href="#"><span
+                    <a class="text-text-muted hover:text-white" href="index.html"><span
                             class="material-symbols-outlined text-lg">share</span></a>
-                    <a class="text-text-muted hover:text-white" href="#"><span
+                    <a class="text-text-muted hover:text-white" href="index.html"><span
                             class="material-symbols-outlined text-lg">rss_feed</span></a>
                 </div>
             </div>
@@ -1085,6 +1116,175 @@
                 messageEl.classList.add('text-red-500');
             }
         });
+
+        // --- Checkout & Orders ---
+        async function handleCheckout() {
+            const {
+                data: {
+                    session
+                }
+            } = await supabase.auth.getSession();
+
+            if (!session) {
+                const authMessageEl = document.getElementById('auth-message');
+                authMessageEl.textContent = 'Please login to complete your purchase.';
+                authMessageEl.className = "mt-4 text-center text-sm block text-primary font-bold";
+                openAuth();
+                return;
+            }
+
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            const checkoutBtn = document.querySelector('#cart-drawer button.bg-primary');
+            const originalContent = checkoutBtn.innerHTML;
+            checkoutBtn.disabled = true;
+            checkoutBtn.innerHTML =
+                '<span class="animate-spin material-symbols-outlined text-sm">sync</span> Processing...';
+
+            try {
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+                // 1. Create the order
+                const {
+                    data: order,
+                    error: orderError
+                } = await supabase
+                    .from('orders')
+                    .insert([{
+                        user_id: session.user.id,
+                        total_amount: total,
+                        status: 'completed' // Simulating instant success
+                    }])
+                    .select()
+                    .single();
+
+                if (orderError) throw orderError;
+
+                // 2. Create order items
+                const orderItems = cart.map(item => ({
+                    order_id: order.id,
+                    tea_id: item.id,
+                    quantity: item.quantity,
+                    price_at_purchase: item.price
+                }));
+
+                const {
+                    error: itemsError
+                } = await supabase
+                    .from('order_items')
+                    .insert(orderItems);
+
+                if (itemsError) throw itemsError;
+
+                // 3. Success!
+                alert('Order placed successfully! 🍵');
+                cart = [];
+                updateCartUI();
+                closeCart();
+
+            } catch (err) {
+                console.error('Checkout error:', err);
+                alert('Error placing order: ' + err.message);
+            } finally {
+                checkoutBtn.disabled = false;
+                checkoutBtn.innerHTML = originalContent;
+            }
+        }
+
+        document.querySelector('#cart-drawer button.bg-primary').addEventListener('click', handleCheckout);
+
+        // --- Order History UI ---
+        const ordersDrawer = document.getElementById('orders-drawer');
+        const ordersContent = document.getElementById('orders-content');
+        const orderList = document.getElementById('order-list');
+
+        function openOrders() {
+            ordersDrawer.classList.remove('hidden');
+            setTimeout(() => {
+                ordersContent.classList.remove('translate-x-full');
+            }, 10);
+            fetchOrders();
+        }
+
+        function closeOrders() {
+            ordersContent.classList.add('translate-x-full');
+            setTimeout(() => {
+                ordersDrawer.classList.add('hidden');
+            }, 300);
+        }
+
+        async function fetchOrders() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+
+            orderList.innerHTML = `
+                <div class="flex justify-center py-20">
+                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                </div>
+            `;
+
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select(`
+                    id,
+                    total_amount,
+                    status,
+                    created_at,
+                    order_items (
+                        quantity,
+                        price_at_purchase,
+                        teas ( name )
+                    )
+                `)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching orders:', error);
+                orderList.innerHTML = '<p class="text-red-400 text-center">Errore nel caricamento degli ordini.</p>';
+                return;
+            }
+
+            if (!orders || orders.length === 0) {
+                orderList.innerHTML = `
+                    <div class="text-center py-20 text-text-muted">
+                        <span class="material-symbols-outlined text-4xl mb-2">inbox</span>
+                        <p>Non hai ancora effettuato ordini.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            orderList.innerHTML = orders.map(order => `
+                <div class="bg-surface-dark/50 border border-[#2d4724] rounded-xl p-5 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-[10px] text-primary font-bold uppercase tracking-widest">Ordine #${order.id.slice(0, 8)}</p>
+                            <p class="text-xs text-text-muted">${new Date(order.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <span class="px-2 py-1 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase">${order.status}</span>
+                    </div>
+                    <div class="space-y-2">
+                        ${order.order_items.map(item => `
+                            <div class="flex justify-between text-sm">
+                                <span class="text-white">${item.quantity}x ${item.teas.name}</span>
+                                <span class="text-text-muted">$${(item.quantity * item.price_at_purchase).toFixed(2)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="pt-3 border-t border-[#2d4724] flex justify-between items-center">
+                        <span class="text-white font-bold">Totale</span>
+                        <span class="text-primary font-bold text-lg">$${order.total_amount.toFixed(2)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('orders-button').addEventListener('click', openOrders);
+        document.getElementById('close-orders').addEventListener('click', closeOrders);
+        document.getElementById('orders-overlay').addEventListener('click', closeOrders);
 
         // Initialize
         updateCartUI();

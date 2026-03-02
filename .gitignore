@@ -1,0 +1,30 @@
+# Sensitive credentials
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.example
+
+# Dependency directories
+node_modules/
+jspm_packages/
+web_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+out/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+supabaseClient.js.backup
