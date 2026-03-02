@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Support - Tea Collective</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#4ce619", "background-dark": "#152111", "surface-dark": "#1d2b19", "text-muted": "#a0c893" },
+                    fontFamily: { "display": ["Manrope", "sans-serif"] },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+
+<body class="bg-background-dark text-white antialiased min-h-screen flex flex-col font-display">
+    <!-- Header (Shared) -->
+    <header class="sticky top-0 z-50 w-full border-b border-[#2d4724]/50 bg-background-dark/80 backdrop-blur-md">
+        <div class="px-4 md:px-8 xl:px-40 py-3 flex justify-between items-center">
+            <a class="flex items-center gap-3" href="index.html">
+                <span class="material-symbols-outlined !text-3xl text-primary">emoji_food_beverage</span>
+                <h2 class="text-xl font-bold">Tea Collective</h2>
+            </a>
+            <nav class="hidden lg:flex items-center gap-8">
+                <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                    href="index.html#products">Shop Teas</a>
+                <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                    href="education.html">Education</a>
+                <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                    href="sourcing.html">Sourcing</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <button id="login-button" class="text-white hover:text-primary text-sm font-bold">Login</button>
+                <div id="user-profile" class="hidden items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">person</span>
+                    <button id="logout-button" class="text-text-muted hover:text-red-400 text-xs">Logout</button>
+                </div>
+                <button id="cart-button"
+                    class="relative size-10 rounded-full bg-surface-dark flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                    <span id="cart-badge"
+                        class="absolute -top-1 -right-1 bg-primary text-background-dark text-[10px] font-bold rounded-full size-4 flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <!-- Support Header -->
+        <section class="py-20 bg-surface-dark">
+            <div class="px-4 md:px-8 xl:px-40 text-center">
+                <h1 class="text-5xl font-black mb-4">Support Center</h1>
+                <p class="text-text-muted max-w-xl mx-auto">Everything you need to know about shipping, returns, and our
+                    policies.</p>
+            </div>
+        </section>
+
+        <!-- Shipping & Returns -->
+        <section id="shipping" class="py-20 border-b border-[#2d4724]">
+            <div class="px-4 md:px-8 xl:px-40">
+                <h2 class="text-3xl font-bold mb-10 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">local_shipping</span> Shipping & Returns
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-bold">Global Shipping</h4>
+                        <p class="text-text-muted text-sm leading-relaxed">We ship directly from our climate-controlled
+                            warehouse. Most orders are processed within 24-48 hours. We offer carbon-neutral shipping
+                            options to minimize our environmental footprint.</p>
+                        <ul class="text-text-muted text-sm space-y-2">
+                            <li>• EU & UK: 3-5 business days</li>
+                            <li>• North America: 7-10 business days</li>
+                            <li>• Asia: 4-6 business days</li>
+                        </ul>
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-bold">Return Policy</h4>
+                        <p class="text-text-muted text-sm leading-relaxed">Because tea is a perishable food product, we
+                            cannot accept returns once the vacuum seal has been broken. If you are unhappy with your
+                            order, please contact our support team within 14 days.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="py-20 bg-background-dark border-b border-[#2d4724]">
+            <div class="px-4 md:px-8 xl:px-40">
+                <h2 class="text-3xl font-bold mb-10 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">quiz</span> Frequently Asked Questions
+                </h2>
+                <div class="space-y-6 max-w-3xl">
+                    <div class="p-6 bg-surface-dark border border-[#2d4724] rounded-2xl">
+                        <h4 class="font-bold text-white mb-2">How should I store my tea?</h4>
+                        <p class="text-text-muted text-sm">Keep it in a cool, dark, and dry place. Avoid heat and strong
+                            odors. Our bags are designed with extra-thick foil to keep your tea fresh for up to 2 years
+                            if unopened.</p>
+                    </div>
+                    <div class="p-6 bg-surface-dark border border-[#2d4724] rounded-2xl">
+                        <h4 class="font-bold text-white mb-2">Is your tea organic?</h4>
+                        <p class="text-text-muted text-sm">Most of our small-batch farmers don't pay for expensive
+                            international certifications, but they practice traditional organic farming, avoiding
+                            chemical pesticides and fertilizers.</p>
+                    </div>
+                    <div class="p-6 bg-surface-dark border border-[#2d4724] rounded-2xl">
+                        <h4 class="font-bold text-white mb-2">Can I modify my order?</h4>
+                        <p class="text-text-muted text-sm">Once an order is placed, it is sent immediately to our
+                            fulfillment center. If you need to make changes, please contact us via the contact form as
+                            soon as possible.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Privacy Policy -->
+        <section id="privacy" class="py-20 bg-surface-dark">
+            <div class="px-4 md:px-8 xl:px-40 max-w-4xl">
+                <h2 class="text-3xl font-bold mb-6">Privacy Policy</h2>
+                <div class="text-text-muted text-sm space-y-4 leading-relaxed">
+                    <p>At Tea Collective, your privacy is paramount. We only collect the data necessary to process your
+                        orders and improve your shopping experience.</p>
+                    <p>We do not sell your personal information to third parties. Your payment data is handled securely
+                        by our payment processors and never stored on our servers.</p>
+                    <p>For more detailed information, please contact our data protection officer at
+                        privacy@teacollective.com.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-background-dark border-t border-[#2d4724] py-8 text-center text-xs text-text-muted">
+        <div class="px-4 md:px-8 xl:px-40">
+            <a href="index.html" class="hover:text-primary transition-colors mb-4 inline-block">Back to Shop</a>
+            <p>&copy; 2024 Tea Collective. Support Center.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        const cartBadge = document.getElementById('cart-badge');
+        const loginBtn = document.getElementById('login-button');
+        const userProfile = document.getElementById('user-profile');
+        let cart = JSON.parse(localStorage.getItem('tea-cart') || '[]');
+        cartBadge.textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (session) { loginBtn.classList.add('hidden'); userProfile.classList.replace('hidden', 'flex'); }
+            else { loginBtn.classList.remove('hidden'); userProfile.classList.replace('flex', 'hidden'); }
+        });
+        document.getElementById('logout-button').onclick = () => supabase.auth.signOut();
+    </script>
+</body>
+
+</html>

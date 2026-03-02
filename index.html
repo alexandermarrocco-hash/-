@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Tea Collective - Rare Tea Marketplace</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Tailwind Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4ce619",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#152111",
+                        "surface-dark": "#1d2b19",
+                        "surface-darker": "#111a0d",
+                        "accent-wood": "#2d4724",
+                        "text-main": "#f0f2f0",
+                        "text-muted": "#a0c893",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                    backgroundImage: {
+                        'tea-gradient': 'linear-gradient(to bottom, rgba(21, 33, 17, 0.8), rgba(21, 33, 17, 1))',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #152111;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2d4724;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4ce619;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-text-main antialiased min-h-screen flex flex-col font-display">
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-50 w-full border-b border-[#2d4724]/50 bg-background-dark/80 backdrop-blur-md">
+        <div class="px-4 md:px-8 xl:px-40 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo & Brand -->
+                <div class="flex items-center gap-8">
+                    <a class="flex items-center gap-3 text-white group" href="#products" data-category="All Teas">
+                        <div class="size-8 text-primary transition-transform group-hover:scale-110">
+                            <span class="material-symbols-outlined !text-3xl">emoji_food_beverage</span>
+                        </div>
+                        <h2 class="text-white text-xl font-bold tracking-tight">Tea Collective</h2>
+                    </a>
+                    <!-- Desktop Nav Links -->
+                    <nav class="hidden lg:flex items-center gap-8 ml-4">
+                        <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                            href="#products" data-category="Oolong">Oolong</a>
+                        <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                            href="#products" data-category="Raw Puerh">Puerh</a>
+                        <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                            href="#products" data-category="White Tea">White</a>
+                        <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                            href="#products" data-category="Green Tea">Green</a>
+                        <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                            href="education.html">Education</a>
+                    </nav>
+                </div>
+                <!-- Right Actions -->
+                <div class="flex items-center gap-4">
+                    <!-- Search Bar (Desktop) -->
+                    <div
+                        class="hidden md:flex items-center bg-surface-dark rounded-full px-3 py-1.5 border border-[#2d4724] focus-within:border-primary/50 transition-colors w-64">
+                        <span class="material-symbols-outlined text-text-muted text-[20px]">search</span>
+                        <input id="search-input"
+                            class="bg-transparent border-none text-sm text-white placeholder-text-muted/70 focus:ring-0 w-full ml-2"
+                            placeholder="Search origins, types..." type="text" />
+                    </div>
+                    <!-- Mobile Search Icon -->
+                    <button class="md:hidden text-white hover:text-primary">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
+                    <!-- Auth Section -->
+                    <div id="auth-ui" class="flex items-center gap-3 border-l border-[#2d4724]/50 pl-4">
+                        <button id="login-button"
+                            class="text-white hover:text-primary text-sm font-bold transition-colors">
+                            Login
+                        </button>
+                        <div id="user-profile" class="hidden items-center gap-3">
+                            <div
+                                class="size-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined text-[18px]">person</span>
+                            </div>
+                            <button id="logout-button"
+                                class="text-text-muted hover:text-red-400 text-xs transition-colors">
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- Cart Button -->
+                    <button id="cart-button"
+                        class="relative flex items-center justify-center size-10 rounded-full bg-surface-dark text-white hover:bg-[#2d4724] hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                        <span id="cart-badge"
+                            class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-background-dark">0</span>
+                    </button>
+                    <!-- Mobile Menu Button -->
+                    <button class="lg:hidden text-white hover:text-primary">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cart Drawer -->
+    <div id="cart-drawer" class="fixed inset-0 z-[100] hidden">
+        <div id="cart-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div
+            class="absolute right-0 top-0 h-full w-full max-w-md bg-background-dark border-l border-[#2d4724] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300">
+            <div class="p-6 border-b border-[#2d4724] flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">shopping_bag</span>
+                    Il tuo Carrello
+                </h3>
+                <button id="close-cart" class="text-text-muted hover:text-white">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-4">
+                <!-- Cart items will be injected here -->
+            </div>
+            <div class="p-6 border-t border-[#2d4724] bg-surface-darker">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-text-muted">Totale</span>
+                    <span id="cart-total" class="text-2xl font-bold text-white">$0.00</span>
+                </div>
+                <button
+                    class="w-full bg-primary hover:bg-primary/90 text-background-dark font-bold py-4 rounded-lg transition-all shadow-lg active:scale-[0.98]">
+                    Procedi al Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="product-modal" class="fixed inset-0 z-[100] hidden">
+        <div id="modal-overlay" class="absolute inset-0 bg-black/80 backdrop-blur-md"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div
+                class="relative bg-surface-dark w-full max-w-4xl max-h-[90vh] rounded-2xl overflow-hidden border border-primary/20 shadow-2xl flex flex-col md:flex-row transform scale-95 opacity-0 transition-all duration-300">
+                <button id="close-modal"
+                    class="absolute top-4 right-4 z-10 size-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+                <!-- Image Section -->
+                <div class="w-full md:w-1/2 h-64 md:h-auto bg-cover bg-center" id="modal-image"></div>
+                <!-- Content Section -->
+                <div class="w-full md:w-1/2 p-8 overflow-y-auto flex flex-col">
+                    <div class="mb-2">
+                        <span id="modal-category"
+                            class="text-primary text-xs font-bold uppercase tracking-widest"></span>
+                    </div>
+                    <h2 id="modal-title" class="text-3xl font-bold text-white mb-4"></h2>
+                    <p id="modal-description" class="text-text-muted leading-relaxed mb-6"></p>
+
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <h4 class="text-white text-sm font-bold mb-2 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">thermostat</span>
+                                Brew Temp
+                            </h4>
+                            <p id="modal-temp" class="text-text-muted text-sm"></p>
+                        </div>
+                        <div>
+                            <h4 class="text-white text-sm font-bold mb-2 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">timer</span>
+                                Steep Time
+                            </h4>
+                            <p id="modal-time" class="text-text-muted text-sm"></p>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h4 class="text-white text-sm font-bold mb-3 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-sm">palette</span>
+                            Tasting Notes
+                        </h4>
+                        <div id="modal-notes" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <div class="mt-auto pt-6 border-t border-[#2d4724] flex items-center justify-between">
+                        <div class="flex flex-col">
+                            <span id="modal-price" class="text-2xl font-bold text-white"></span>
+                            <span id="modal-weight" class="text-xs text-text-muted"></span>
+                        </div>
+                        <button id="modal-add-to-cart"
+                            class="bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-8 rounded-lg transition-transform hover:scale-105 active:scale-95 shadow-lg">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <section class="relative w-full h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+            <!-- Hero Background -->
+            <div class="absolute inset-0 bg-cover bg-center z-0"
+                data-alt="Misty tea mountains with lush green terraces in morning fog"
+                style="background-image: url('assets/images/index_hero_v2_1772466229928.png');">
+            </div>
+            <!-- Overlay Gradient -->
+            <div
+                class="absolute inset-0 bg-gradient-to-b from-background-dark/30 via-background-dark/50 to-background-dark z-10">
+            </div>
+            <!-- Hero Content -->
+            <div
+                class="relative z-20 text-center px-4 max-w-4xl mx-auto flex flex-col gap-6 items-center animate-fade-in-up">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-sm mb-2">
+                    <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                    <span class="text-primary text-xs font-bold tracking-wider uppercase">Spring 2024 Harvest
+                        Arrived</span>
+                </div>
+                <h1
+                    class="text-white text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight drop-shadow-lg">
+                    Essence of the <br /><span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-white to-text-muted">Mountains</span>
+                </h1>
+                <p class="text-gray-200 text-lg md:text-xl font-light max-w-2xl leading-relaxed text-shadow-sm">
+                    Curated single-origin teas from ancient groves. Experience the terroir of China's most revered peaks
+                    in every cup.
+                </p>
+                <div class="mt-4 flex flex-col sm:flex-row gap-4">
+                    <button
+                        class="bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(76,230,25,0.3)]">
+                        Shop Rare Teas
+                    </button>
+                    <a href="sourcing.html"
+                        class="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 font-medium py-3 px-8 rounded-lg transition-all flex items-center gap-2">
+                        <span>Our Sourcing</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+        <!-- Filters & Sort Bar -->
+        <div class="sticky top-[73px] z-40 bg-background-dark/95 backdrop-blur border-b border-[#2d4724]">
+            <div
+                class="px-4 md:px-8 xl:px-40 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide">
+                    <span class="text-text-muted text-sm font-medium mr-2 whitespace-nowrap">Filter by:</span>
+                    <button data-category="All Teas"
+                        class="px-4 py-1.5 rounded-full bg-primary text-background-dark text-sm font-bold shadow-sm whitespace-nowrap">
+                        All Teas
+                    </button>
+                    <button data-category="Oolong"
+                        class="px-4 py-1.5 rounded-full bg-surface-dark border border-[#2d4724] text-text-muted hover:text-white hover:border-text-muted transition-colors text-sm font-medium whitespace-nowrap">
+                        Oolong
+                    </button>
+                    <button data-category="Raw Puerh"
+                        class="px-4 py-1.5 rounded-full bg-surface-dark border border-[#2d4724] text-text-muted hover:text-white hover:border-text-muted transition-colors text-sm font-medium whitespace-nowrap">
+                        Puerh
+                    </button>
+                    <button data-category="Green Tea"
+                        class="px-4 py-1.5 rounded-full bg-surface-dark border border-[#2d4724] text-text-muted hover:text-white hover:border-text-muted transition-colors text-sm font-medium whitespace-nowrap">
+                        Green
+                    </button>
+                    <button data-category="White Tea"
+                        class="px-4 py-1.5 rounded-full bg-surface-dark border border-[#2d4724] text-text-muted hover:text-white hover:border-text-muted transition-colors text-sm font-medium whitespace-nowrap">
+                        White
+                    </button>
+                </div>
+                <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                    <span class="text-text-muted text-sm hidden sm:inline">Sort:</span>
+                    <select
+                        class="bg-surface-dark border border-[#2d4724] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-2">
+                        <option>Featured</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Newest Arrivals</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!-- Product Grid Section -->
+        <section id="products" class="px-4 md:px-8 xl:px-40 py-12 bg-background-dark">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-3xl font-bold text-white tracking-tight">Rare Harvests</h2>
+                <a class="text-primary hover:text-primary/80 text-sm font-bold flex items-center gap-1" href="#">
+                    View Collection <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+            </div>
+            <!-- Loading State -->
+            <div id="loading-state" class="flex justify-center py-20">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+            <!-- Dynamic Product Grid -->
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 hidden">
+                <!-- Products will be injected here -->
+            </div>
+            <!-- No Products State -->
+            <div id="no-products" class="hidden text-center py-20">
+                <p class="text-text-muted">No teas found in this category.</p>
+            </div>
+            <!-- Load More -->
+            <div class="flex justify-center mt-16">
+                <button id="load-more"
+                    class="border border-[#2d4724] text-white hover:bg-[#2d4724] hover:text-primary font-medium py-3 px-10 rounded-lg transition-colors flex items-center gap-2">
+                    Load More Teas
+                </button>
+            </div>
+        </section>
+        <!-- Feature Section (Terroir) -->
+        <section id="education" class="py-20 bg-[#111a0d] border-t border-[#2d4724]">
+            <div class="px-4 md:px-8 xl:px-40">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="order-2 lg:order-1 space-y-6">
+                        <h2 class="text-3xl md:text-4xl font-bold text-white">From Ancient Groves to Your Cup</h2>
+                        <div class="space-y-4">
+                            <div class="flex gap-4">
+                                <div
+                                    class="shrink-0 size-12 rounded-full bg-[#2d4724] flex items-center justify-center text-primary">
+                                    <span class="material-symbols-outlined">landscape</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-white text-xl font-bold mb-1">Authentic Terroir</h3>
+                                    <p class="text-text-muted leading-relaxed">We source exclusively from the specific
+                                        mountains famous for each tea variety, ensuring the true "Yan Yun" (Rock Rhyme)
+                                        or "Cha Qi" (Tea Energy).</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div
+                                    class="shrink-0 size-12 rounded-full bg-[#2d4724] flex items-center justify-center text-primary">
+                                    <span class="material-symbols-outlined">eco</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-white text-xl font-bold mb-1">Sustainable Harvesting</h3>
+                                    <p class="text-text-muted leading-relaxed">Our partners practice traditional farming
+                                        methods, avoiding pesticides and respecting the biodiversity of the tea gardens.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="sourcing.html"
+                            class="mt-4 text-primary font-bold hover:text-white transition-colors flex items-center gap-2 group">
+                            Read Our Sourcing Story <span
+                                class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div class="order-1 lg:order-2 relative h-[400px] rounded-2xl overflow-hidden shadow-2xl">
+                        <div class="absolute inset-0 bg-cover bg-center"
+                            data-alt="Tea farmer picking leaves in a lush green tea plantation"
+                            data-location="Yunnan, China"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBJ0YqvTei1-R8Kl8-Ha11qqMC7diBPhkaemmwyc9xZfNMmT7bfWUaWR6n56_311PgOv1jDWiWKVIniLmOAOBRCNUsq-KZzqOK02BHx_Oudv7fSMq2kLR_Ha0hhKcQmFP8lyuXjJN001bTAbeFiqR1MQDVdfpMAw92MIfzh3wfjVpDLzuDP-IfJxeRUy9e2jCtk5FMrU65D7esEluf_KDyxrEwiYbZc_697iRHiqVGZgHQOSe4jm5ieSws3bVhcx8io2dnN0R3jN48');">
+                        </div>
+                        <div
+                            class="absolute bottom-6 left-6 bg-black/60 backdrop-blur px-4 py-2 rounded-lg border-l-4 border-primary">
+                            <p class="text-white font-medium">Yunnan, China</p>
+                            <p class="text-text-muted text-xs">Home of Puerh Tea</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Newsletter Section -->
+        <section class="py-16 bg-surface-dark border-t border-[#2d4724]">
+            <div class="px-4 md:px-8 xl:px-40 text-center max-w-3xl mx-auto">
+                <span class="material-symbols-outlined text-4xl text-primary mb-4">mail</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">Join the Collective</h2>
+                <p class="text-text-muted mb-8">Receive early access to rare tea drops, educational guides, and
+                    exclusive brewing tips directly to your inbox.</p>
+                <form id="newsletter-form" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                    <input id="newsletter-email"
+                        class="flex-grow bg-[#152111] border border-[#2d4724] text-white px-4 py-3 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder-text-muted/50"
+                        placeholder="Enter your email address" type="email" required />
+                    <button type="submit"
+                        class="bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-6 rounded-lg transition-colors whitespace-nowrap">
+                        Subscribe
+                    </button>
+                </form>
+                <div id="newsletter-message" class="mt-4 text-sm hidden"></div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-background-dark border-t border-[#2d4724] pt-16 pb-8">
+        <div class="px-4 md:px-8 xl:px-40">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                <div class="col-span-2 lg:col-span-2">
+                    <a class="flex items-center gap-2 text-white mb-4" href="#">
+                        <span class="material-symbols-outlined text-primary text-2xl">emoji_food_beverage</span>
+                        <span class="text-xl font-bold">Tea Collective</span>
+                    </a>
+                    <p class="text-text-muted text-sm leading-relaxed max-w-sm">
+                        Dedicated to sourcing the finest teas from China's most historic terroirs. Bridging the gap
+                        between ancient tradition and modern connoisseurship.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Shop</h4>
+                    <ul class="space-y-2 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">Oolong</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Puerh</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Green Tea</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">White Tea</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Teaware</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Education</h4>
+                    <ul class="space-y-2 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="education.html#brewing">Brewing
+                                Guides</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="education.html#varieties">Tea
+                                Varieties</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="sourcing.html">Sourcing Trips</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="education.html#history">Tea
+                                History</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Support</h4>
+                    <ul class="space-y-2 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="support.html#shipping">Shipping &amp;
+                                Returns</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="contact.html">Contact Us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="support.html#faq">FAQ</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="support.html#privacy">Privacy
+                                Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-[#2d4724] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-text-muted text-xs">© 2024 Tea Collective. All rights reserved.</p>
+                <div class="flex gap-4">
+                    <!-- Social Icons placeholders using material symbols for simplicity in this context, usually would use SVGs -->
+                    <a class="text-text-muted hover:text-white" href="#"><span
+                            class="material-symbols-outlined text-lg">public</span></a>
+                    <a class="text-text-muted hover:text-white" href="#"><span
+                            class="material-symbols-outlined text-lg">share</span></a>
+                    <a class="text-text-muted hover:text-white" href="#"><span
+                            class="material-symbols-outlined text-lg">rss_feed</span></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Drawer -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 hidden">
+        <!-- Overlay -->
+        <div id="cart-overlay" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+        <!-- Drawer Content -->
+        <div
+            class="absolute right-0 top-0 h-full w-full max-w-md bg-background-dark border-l border-[#2d4724] shadow-lg transform translate-x-full transition-transform duration-300 ease-out flex flex-col">
+            <!-- Header -->
+            <div class="p-6 border-b border-[#2d4724] flex items-center justify-between">
+                <h3 class="text-2xl font-bold text-white">Your Cart</h3>
+                <button id="close-cart" class="text-text-muted hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+
+            <!-- Cart Items -->
+            <div id="cart-items" class="flex-grow p-6 space-y-4 overflow-y-auto custom-scrollbar">
+                <!-- Cart items will be rendered here by JavaScript -->
+            </div>
+
+            <!-- Footer / Checkout -->
+            <div class="p-6 border-t border-[#2d4724] space-y-4">
+                <div class="flex justify-between items-center text-white text-lg font-bold">
+                    <span>Total:</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+                <button
+                    class="w-full bg-primary text-background-dark font-bold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">shopping_bag</span>
+                    Proceed to Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <!-- Overlay -->
+        <div id="modal-overlay" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+        <!-- Modal Content -->
+        <div
+            class="relative bg-surface-dark rounded-xl shadow-2xl border border-[#2d4724] w-full max-w-3xl transform scale-95 opacity-0 transition-all duration-300 ease-out">
+            <button id="close-modal"
+                class="absolute top-4 right-4 text-text-muted hover:text-white transition-colors z-10">
+                <span class="material-symbols-outlined text-3xl">close</span>
+            </button>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+                <!-- Product Image -->
+                <div id="modal-image" class="aspect-square rounded-lg bg-cover bg-center bg-surface-darker">
+                </div>
+
+                <!-- Product Details -->
+                <div class="flex flex-col">
+                    <span id="modal-category"
+                        class="text-primary text-xs font-bold uppercase tracking-wider mb-2">Category</span>
+                    <h3 id="modal-title" class="text-white text-3xl font-bold mb-3 leading-tight">Product Name</h3>
+                    <p id="modal-description" class="text-text-muted text-sm mb-4 leading-relaxed">Product description
+                        goes here.</p>
+
+                    <div class="flex flex-wrap gap-2 mb-4" id="modal-notes">
+                        <!-- Tasting notes will be injected here -->
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <p class="text-text-muted text-xs uppercase font-bold mb-1">Brew Temp</p>
+                            <p id="modal-temp" class="text-white text-lg font-bold">95°C</p>
+                        </div>
+                        <div>
+                            <p class="text-text-muted text-xs uppercase font-bold mb-1">Steep Time</p>
+                            <p id="modal-time" class="text-white text-lg font-bold">30s</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto flex items-center justify-between pt-4 border-t border-[#2d4724]">
+                        <span class="text-white font-bold text-2xl">
+                            <span id="modal-price">$0.00</span>
+                            <span id="modal-weight" class="text-sm text-text-muted font-normal">/ unit</span>
+                        </span>
+                        <button id="modal-add-to-cart"
+                            class="bg-primary text-background-dark font-bold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined">shopping_bag</span>
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4">
+        <div id="auth-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div id="auth-modal-content"
+            class="relative bg-surface-dark w-full max-w-md rounded-2xl overflow-hidden border border-primary/20 shadow-2xl p-8 transform scale-95 opacity-0 transition-all duration-300">
+            <button id="close-auth" class="absolute top-4 right-4 text-text-muted hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div class="text-center mb-8">
+                <div
+                    class="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mx-auto mb-4">
+                    <span class="material-symbols-outlined text-3xl">lock</span>
+                </div>
+                <h3 id="auth-title" class="text-2xl font-bold text-white">Bentornato</h3>
+                <p id="auth-subtitle" class="text-text-muted text-sm mt-1">Accedi per gestire i tuoi ordini e preferiti
+                </p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex bg-background-dark/50 p-1 rounded-lg mb-6">
+                <button id="tab-login"
+                    class="flex-grow py-2 rounded-md text-sm font-bold bg-primary text-background-dark transition-all">Login</button>
+                <button id="tab-register"
+                    class="flex-grow py-2 rounded-md text-sm font-bold text-text-muted hover:text-white transition-all">Registrati</button>
+            </div>
+
+            <form id="auth-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-primary uppercase tracking-widest mb-2">Email</label>
+                    <input type="email" id="auth-email" required
+                        class="w-full bg-background-dark border border-[#2d4724] text-white px-4 py-3 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                        placeholder="tua@email.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-primary uppercase tracking-widest mb-2">Password</label>
+                    <input type="password" id="auth-password" required minlength="6"
+                        class="w-full bg-background-dark border border-[#2d4724] text-white px-4 py-3 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                        placeholder="••••••••">
+                </div>
+                <button type="submit" id="auth-submit"
+                    class="w-full bg-primary hover:bg-primary/90 text-background-dark font-bold py-4 rounded-lg transition-all shadow-lg active:scale-[0.98] mt-2">
+                    Accedi
+                </button>
+            </form>
+            <div id="auth-message" class="mt-4 text-center text-sm hidden"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        const productGrid = document.getElementById('product-grid');
+        const loadingState = document.getElementById('loading-state');
+        const noProducts = document.getElementById('no-products');
+        const newsletterForm = document.getElementById('newsletter-form');
+        const searchInput = document.getElementById('search-input');
+        const cartBadge = document.getElementById('cart-badge');
+        const cartDrawer = document.getElementById('cart-drawer');
+        const cartContent = cartDrawer.querySelector('div:nth-child(2)');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotalEl = document.getElementById('cart-total');
+        const productModal = document.getElementById('product-modal');
+        const modalContent = productModal.querySelector('.relative.bg-surface-dark');
+        const authModal = document.getElementById('auth-modal');
+        const authContent = document.getElementById('auth-modal-content');
+        const loginBtn = document.getElementById('login-button');
+        const userProfile = document.getElementById('user-profile');
+        const logoutBtn = document.getElementById('logout-button');
+        const authForm = document.getElementById('auth-form');
+        const authTabLogin = document.getElementById('tab-login');
+        const authTabRegister = document.getElementById('tab-register');
+        const authTitle = document.getElementById('auth-title');
+        const authSubtitle = document.getElementById('auth-subtitle');
+        const authSubmit = document.getElementById('auth-submit');
+        const authMessage = document.getElementById('auth-message');
+        const n8nWebhookUrl = 'http://localhost:5678/webhook/teas'; // Production n8n webhook URL
+
+        let allProducts = [];
+        let cart = JSON.parse(localStorage.getItem('tea-cart') || '[]');
+
+        // Initialize Cart UI
+        function updateCartUI() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartBadge.textContent = count;
+            localStorage.setItem('tea-cart', JSON.stringify(cart));
+            renderCartItems();
+        }
+
+        // --- Cart Drawer Logic ---
+        function openCart() {
+            cartDrawer.classList.remove('hidden');
+            setTimeout(() => {
+                cartContent.style.transform = 'translateX(0)';
+            }, 10);
+        }
+
+        function closeCart() {
+            cartContent.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                cartDrawer.classList.add('hidden');
+            }, 300);
+        }
+
+        function renderCartItems() {
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<div class="text-center py-12 text-text-muted"><span class="material-symbols-outlined text-4xl mb-2">production_quantity_limits</span><p>Il carrello è vuoto</p></div>';
+                cartTotalEl.textContent = '$0.00';
+                return;
+            }
+
+            cartItemsContainer.innerHTML = cart.map(item => `
+                <div class="flex gap-4 bg-surface-darker/50 p-3 rounded-xl border border-[#2d4724]/50">
+                    <img src="${item.image_url}" class="size-16 rounded-lg object-cover bg-surface-dark" />
+                    <div class="flex-grow min-w-0">
+                        <h4 class="text-white font-bold truncate">${item.name}</h4>
+                        <div class="flex items-center justify-between mt-2">
+                            <div class="flex items-center gap-3 bg-surface-dark rounded-full px-2 py-1">
+                                <button onclick="changeQty('${item.id}', -1)" class="text-text-muted hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined text-sm">remove</span>
+                                </button>
+                                <span class="text-white text-xs font-bold w-4 text-center">${item.quantity}</span>
+                                <button onclick="changeQty('${item.id}', 1)" class="text-text-muted hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined text-sm">add</span>
+                                </button>
+                            </div>
+                            <span class="text-primary font-bold">$${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart('${item.id}')" class="text-text-muted hover:text-red-400">
+                        <span class="material-symbols-outlined text-sm">delete</span>
+                    </button>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotalEl.textContent = `$${total.toFixed(2)}`;
+        }
+
+        window.changeQty = function (id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    removeFromCart(id);
+                } else {
+                    updateCartUI();
+                }
+            }
+        };
+
+        window.removeFromCart = function (id) {
+            cart = cart.filter(i => i.id !== id);
+            updateCartUI();
+        };
+
+        // --- Modal Logic ---
+        function openModal(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            document.getElementById('modal-image').style.backgroundImage = `url('${product.image_url}')`;
+            document.getElementById('modal-title').textContent = product.name;
+            document.getElementById('modal-category').textContent = product.category;
+            document.getElementById('modal-description').textContent = product.description || product.origin_details;
+            document.getElementById('modal-temp').textContent = product.brewing_guide?.temperature || '95°C';
+            document.getElementById('modal-time').textContent = product.brewing_guide?.steep_time || '30s';
+            document.getElementById('modal-price').textContent = `$${product.price.toFixed(2)}`;
+            document.getElementById('modal-weight').textContent = `/ ${product.weight_unit}`;
+
+            const notesEl = document.getElementById('modal-notes');
+            notesEl.innerHTML = (product.tasting_notes || []).map(note => `
+                <span class="px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-xs font-bold">${note}</span>
+            `).join('');
+
+            document.getElementById('modal-add-to-cart').onclick = () => {
+                addToCart(product.id);
+                closeModal();
+                openCart();
+            };
+
+            productModal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.replace('scale-95', 'scale-100');
+                modalContent.classList.replace('opacity-0', 'opacity-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            modalContent.classList.replace('scale-100', 'scale-95');
+            modalContent.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => {
+                productModal.classList.add('hidden');
+            }, 300);
+        }
+
+        // --- Auth Logic ---
+        let authMode = 'login'; // 'login' or 'register'
+
+        function openAuth() {
+            authModal.classList.remove('hidden');
+            setTimeout(() => {
+                authContent.classList.replace('scale-95', 'scale-100');
+                authContent.classList.replace('opacity-0', 'opacity-100');
+            }, 10);
+        }
+
+        function closeAuth() {
+            authContent.classList.replace('scale-100', 'scale-95');
+            authContent.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => {
+                authModal.classList.add('hidden');
+            }, 300);
+        }
+
+        function switchAuthMode(mode) {
+            authMode = mode;
+            if (mode === 'login') {
+                authTabLogin.classList.add('bg-primary', 'text-background-dark');
+                authTabLogin.classList.remove('text-text-muted', 'hover:text-white');
+                authTabRegister.classList.remove('bg-primary', 'text-background-dark');
+                authTabRegister.classList.add('text-text-muted', 'hover:text-white');
+                authTitle.textContent = 'Bentornato';
+                authSubtitle.textContent = 'Accedi per gestire i tuoi ordini e preferiti';
+                authSubmit.textContent = 'Accedi';
+            } else {
+                authTabRegister.classList.add('bg-primary', 'text-background-dark');
+                authTabRegister.classList.remove('text-text-muted', 'hover:text-white');
+                authTabLogin.classList.remove('bg-primary', 'text-background-dark');
+                authTabLogin.classList.add('text-text-muted', 'hover:text-white');
+                authTitle.textContent = 'Unisciti a noi';
+                authSubtitle.textContent = 'Crea un account per un\'esperienza personalizzata';
+                authSubmit.textContent = 'Registrati';
+            }
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            authMessage.classList.remove('hidden', 'text-primary', 'text-red-400', 'text-amber-400');
+            authMessage.textContent = 'Attendere...';
+
+            try {
+                if (authMode === 'login') {
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) {
+                        if (error.message.includes('Email not confirmed')) {
+                            authMessage.textContent = 'Per favore, conferma la tua email prima di accedere. Controlla la tua posta in arrivo.';
+                            authMessage.classList.add('text-amber-400');
+                            return;
+                        }
+                        throw error;
+                    }
+                    authMessage.textContent = 'Accesso effettuato!';
+                    authMessage.classList.add('text-primary');
+                    setTimeout(() => { closeAuth(); authForm.reset(); }, 1500);
+                } else {
+                    const { data, error } = await supabase.auth.signUp({
+                        email,
+                        password,
+                        options: {
+                            emailRedirectTo: window.location.origin
+                        }
+                    });
+                    if (error) throw error;
+
+                    if (data.user && data.user.identities && data.user.identities.length === 0) {
+                        authMessage.textContent = 'Questa email è già registrata. Prova ad accedere.';
+                        authMessage.classList.add('text-amber-400');
+                    } else {
+                        authMessage.textContent = 'Registrazione quasi completata! Ti abbiamo inviato un’email di conferma. Controlla la tua posta (anche nello spam).';
+                        authMessage.classList.add('text-primary');
+                        authForm.reset();
+                    }
+                }
+            } catch (error) {
+                authMessage.textContent = error.message;
+                authMessage.classList.add('text-red-400');
+            }
+        }
+
+        async function handleLogout() {
+            const { error } = await supabase.auth.signOut();
+            if (error) console.error('Logout error:', error);
+        }
+
+        // Watch for Auth changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (session) {
+                loginBtn.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+                userProfile.classList.add('flex');
+            } else {
+                loginBtn.classList.remove('hidden');
+                userProfile.classList.add('hidden');
+                userProfile.classList.remove('flex');
+            }
+        });
+
+        // --- Core Fetching ---
+        // Fetch products from Supabase
+        async function fetchProducts(category = 'All Teas') {
+            loadingState.classList.remove('hidden');
+            productGrid.classList.add('hidden');
+            noProducts.classList.add('hidden');
+
+            let query = supabase.from('teas').select('*');
+
+            if (category !== 'All Teas') {
+                query = query.eq('category', category);
+            }
+
+            const { data, error } = await query;
+
+            allProducts = data || [];
+            loadingState.classList.add('hidden');
+
+            if (error) {
+                console.error('Error fetching products:', error);
+                return;
+            }
+
+            if (allProducts.length > 0) {
+                renderProducts(allProducts);
+                productGrid.classList.remove('hidden');
+            } else {
+                noProducts.classList.remove('hidden');
+            }
+        }
+
+        // Render products to the grid
+        function renderProducts(products) {
+            productGrid.innerHTML = products.map(product => `
+                <div class="group bg-surface-dark rounded-xl overflow-hidden border border-[#2d4724] hover:border-primary/50 transition-all duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex flex-col h-full cursor-pointer" onclick="openModal('${product.id}')">
+                    <div class="relative aspect-square overflow-hidden bg-surface-darker">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            style="background-image: url('${product.image_url}');">
+                        </div>
+                        <div class="absolute top-3 right-3 bg-surface-darker/80 backdrop-blur text-primary text-xs font-bold px-2 py-1 rounded border border-primary/20">
+                            ${product.harvest_season}
+                        </div>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <button onclick="event.stopPropagation(); addToCart('${product.id}')"
+                                class="bg-primary text-background-dark font-bold py-2 px-6 rounded-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">shopping_bag</span>
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5 flex flex-col flex-grow">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-primary text-xs font-bold uppercase tracking-wider">${product.category}</span>
+                            <div class="flex gap-0.5 text-primary">
+                                ${Array(Math.floor(product.rating || 5)).fill('<span class="material-symbols-outlined text-[14px] fill-current">star</span>').join('')}
+                                ${(product.rating || 5) % 1 !== 0 ? '<span class="material-symbols-outlined text-[14px] fill-current">star_half</span>' : ''}
+                            </div>
+                        </div>
+                        <h3 class="text-white text-lg font-bold mb-1 leading-tight group-hover:text-primary transition-colors">
+                            ${product.name}
+                        </h3>
+                        <p class="text-text-muted text-sm mb-4 line-clamp-2">${product.description || ''}</p>
+                        <div class="mt-auto flex items-center justify-between pt-4 border-t border-[#2d4724]">
+                            <span class="text-white font-bold text-lg">$${product.price.toFixed(2)} <span class="text-xs text-text-muted font-normal">/ ${product.weight_unit}</span></span>
+                            <button class="text-text-muted hover:text-white transition-colors" onclick="event.stopPropagation();">
+                                <span class="material-symbols-outlined">favorite</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('cart-button').addEventListener('click', openCart);
+        document.getElementById('close-cart').addEventListener('click', closeCart);
+        document.getElementById('cart-overlay').addEventListener('click', closeCart);
+        document.getElementById('close-modal').addEventListener('click', closeModal);
+        document.getElementById('modal-overlay').addEventListener('click', closeModal);
+        document.getElementById('login-button').addEventListener('click', openAuth);
+        document.getElementById('close-auth').addEventListener('click', closeAuth);
+        document.getElementById('auth-overlay').addEventListener('click', closeAuth);
+        document.getElementById('tab-login').addEventListener('click', () => switchAuthMode('login'));
+        document.getElementById('tab-register').addEventListener('click', () => switchAuthMode('register'));
+        document.getElementById('auth-form').addEventListener('submit', handleAuth);
+        document.getElementById('logout-button').addEventListener('click', handleLogout);
+
+        window.openModal = openModal;
+
+        // Cart Actions
+        window.addToCart = function (productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            updateCartUI();
+
+            // Subtle feedback
+            const btn = event.currentTarget;
+            if (btn && btn.tagName === 'BUTTON') {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Added!';
+                btn.classList.replace('bg-primary', 'bg-white');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.replace('bg-white', 'bg-primary');
+                }, 1000);
+            }
+        };
+
+        // Handle Search
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allProducts.filter(p =>
+                p.name.toLowerCase().includes(term) ||
+                p.description.toLowerCase().includes(term) ||
+                p.category.toLowerCase().includes(term)
+            );
+            renderProducts(filtered);
+            if (filtered.length === 0) {
+                noProducts.classList.remove('hidden');
+                productGrid.classList.add('hidden');
+            } else {
+                noProducts.classList.add('hidden');
+                productGrid.classList.remove('hidden');
+            }
+        });
+
+        // Handle filtering
+        function setActiveFilter(category) {
+            document.querySelectorAll('[data-category]').forEach(el => {
+                if (el.tagName === 'BUTTON') {
+                    if (el.dataset.category === category) {
+                        el.classList.remove('bg-surface-dark', 'text-text-muted');
+                        el.classList.add('bg-primary', 'text-background-dark');
+                    } else {
+                        el.classList.add('bg-surface-dark', 'text-text-muted');
+                        el.classList.remove('bg-primary', 'text-background-dark');
+                    }
+                }
+            });
+        }
+
+        document.querySelectorAll('[data-category]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                const category = el.dataset.category;
+                if (!category) return;
+
+                if (el.tagName === 'A') {
+                    // Smooth scroll to products if it's a link
+                    const productsSection = document.getElementById('products');
+                    if (productsSection) {
+                        productsSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+
+                setActiveFilter(category);
+                fetchProducts(category);
+            });
+        });
+
+        // Handle Newsletter Submission (n8n Webhook)
+        newsletterForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('newsletter-email').value;
+            const messageEl = document.getElementById('newsletter-message');
+
+            messageEl.classList.remove('hidden', 'text-primary', 'text-red-500');
+            messageEl.textContent = 'Submitting...';
+
+            try {
+                // 1. Save to Supabase (for redundancy)
+                const { error: supabaseError } = await supabase
+                    .from('subscribers')
+                    .insert([{ email: email }]);
+
+                if (supabaseError && supabaseError.code !== '23505') { // Ignore duplicate email error
+                    console.error('Supabase save error:', supabaseError);
+                }
+
+                // 2. Send to n8n Webhook
+                const response = await fetch(n8nWebhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, signup_date: new Date().toISOString() })
+                });
+
+                if (response.ok) {
+                    messageEl.textContent = 'Grazie per esserti iscritto!';
+                    messageEl.classList.add('text-primary');
+                    newsletterForm.reset();
+                } else {
+                    throw new Error('n8n submission failed');
+                }
+            } catch (error) {
+                messageEl.textContent = 'Errore durante l\'iscrizione. Riprova più tardi.';
+                messageEl.classList.add('text-red-500');
+            }
+        });
+
+        // Initialize
+        updateCartUI();
+        fetchProducts();
+        document.getElementById('load-more').classList.add('hidden');
+    </script>
+</body>
+
+</html>

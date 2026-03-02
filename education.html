@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Education - Tea Collective</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Tailwind Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4ce619",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#152111",
+                        "surface-dark": "#1d2b19",
+                        "surface-darker": "#111a0d",
+                        "accent-wood": "#2d4724",
+                        "text-main": "#f0f2f0",
+                        "text-muted": "#a0c893",
+                    },
+                    fontFamily: { "display": ["Manrope", "sans-serif"] },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #152111;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2d4724;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4ce619;
+        }
+    </style>
+</head>
+
+<body class="bg-background-dark text-text-main antialiased min-h-screen flex flex-col font-display">
+    <!-- Top Navigation (Shared) -->
+    <header class="sticky top-0 z-50 w-full border-b border-[#2d4724]/50 bg-background-dark/80 backdrop-blur-md">
+        <div class="px-4 md:px-8 xl:px-40 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-8">
+                    <a class="flex items-center gap-3 text-white group" href="index.html">
+                        <div class="size-8 text-primary transition-transform group-hover:scale-110">
+                            <span class="material-symbols-outlined !text-3xl">emoji_food_beverage</span>
+                        </div>
+                        <h2 class="text-white text-xl font-bold tracking-tight">Tea Collective</h2>
+                    </a>
+                    <nav class="hidden lg:flex items-center gap-8 ml-4">
+                        <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                            href="index.html#products">Shop Teas</a>
+                        <a class="text-white text-sm font-bold border-b-2 border-primary transition-colors"
+                            href="education.html">Education</a>
+                        <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                            href="sourcing.html">Sourcing</a>
+                    </nav>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div id="auth-ui" class="flex items-center gap-3 border-l border-[#2d4724]/50 pl-4">
+                        <button id="login-button"
+                            class="text-white hover:text-primary text-sm font-bold transition-colors">Login</button>
+                        <div id="user-profile" class="hidden items-center gap-3">
+                            <div
+                                class="size-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined text-[18px]">person</span>
+                            </div>
+                            <button id="logout-button"
+                                class="text-text-muted hover:text-red-400 text-xs transition-colors">Logout</button>
+                        </div>
+                    </div>
+                    <button id="cart-button"
+                        class="relative flex items-center justify-center size-10 rounded-full bg-surface-dark text-white hover:bg-[#2d4724] hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                        <span id="cart-badge"
+                            class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-background-dark">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cart Drawer (Shared) -->
+    <div id="cart-drawer" class="fixed inset-0 z-[100] hidden">
+        <div id="cart-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div
+            class="absolute right-0 top-0 h-full w-full max-w-md bg-background-dark border-l border-[#2d4724] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300">
+            <div class="p-6 border-b border-[#2d4724] flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2 font-display">
+                    <span class="material-symbols-outlined text-primary">shopping_bag</span>
+                    Carrello
+                </h3>
+                <button id="close-cart" class="text-text-muted hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-4"></div>
+            <div class="p-6 border-t border-[#2d4724] bg-surface-darker">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-text-muted">Totale</span>
+                    <span id="cart-total" class="text-2xl font-bold text-white">$0.00</span>
+                </div>
+                <button
+                    class="w-full bg-primary hover:bg-primary/90 text-background-dark font-bold py-4 rounded-lg transition-all shadow-lg active:scale-[0.98]">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal (Shared) -->
+    <div id="auth-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4">
+        <div id="auth-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div id="auth-modal-content"
+            class="relative bg-surface-dark w-full max-w-md rounded-2xl overflow-hidden border border-primary/20 shadow-2xl p-8 transform scale-95 opacity-0 transition-all duration-300">
+            <button id="close-auth"
+                class="absolute top-4 right-4 text-text-muted hover:text-white transition-colors"><span
+                    class="material-symbols-outlined">close</span></button>
+            <div class="text-center mb-8">
+                <div
+                    class="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mx-auto mb-4">
+                    <span class="material-symbols-outlined text-3xl">lock</span>
+                </div>
+                <h3 id="auth-title" class="text-2xl font-bold text-white">Bentornato</h3>
+                <p id="auth-subtitle" class="text-text-muted text-sm mt-1">Accedi per gestire i tuoi ordini</p>
+            </div>
+            <div class="flex bg-background-dark/50 p-1 rounded-lg mb-6">
+                <button id="tab-login"
+                    class="flex-grow py-2 rounded-md text-sm font-bold bg-primary text-background-dark transition-all">Login</button>
+                <button id="tab-register"
+                    class="flex-grow py-2 rounded-md text-sm font-bold text-text-muted hover:text-white transition-all">Registrati</button>
+            </div>
+            <form id="auth-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-primary uppercase mb-2">Email</label>
+                    <input type="email" id="auth-email" required
+                        class="w-full bg-background-dark border border-[#2d4724] text-white px-4 py-3 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-primary uppercase mb-2">Password</label>
+                    <input type="password" id="auth-password" required minlength="6"
+                        class="w-full bg-background-dark border border-[#2d4724] text-white px-4 py-3 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                </div>
+                <button type="submit" id="auth-submit"
+                    class="w-full bg-primary hover:bg-primary/90 text-background-dark font-bold py-4 rounded-lg transition-all shadow-lg active:scale-[0.98] mt-2">Accedi</button>
+            </form>
+            <div id="auth-message" class="mt-4 text-center text-sm hidden"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <section class="relative py-24 bg-surface-dark overflow-hidden">
+            <div
+                class="absolute inset-0 bg-[url('assets/images/education_hero_tea_scrolls_1772466149709.png')] bg-cover bg-center mix-blend-overlay opacity-30">
+            </div>
+            <div class="relative z-10 px-4 md:px-8 xl:px-40 text-center">
+                <h1 class="text-4xl md:text-6xl font-black text-white mb-6">Tea Education</h1>
+                <p class="text-text-muted text-lg max-w-2xl mx-auto">Master the art of brewing and discover the rich
+                    history behind every leaf.</p>
+            </div>
+        </section>
+
+        <!-- Brewing Guides -->
+        <section id="brewing" class="py-20 bg-background-dark">
+            <div class="px-4 md:px-8 xl:px-40">
+                <div class="flex items-center gap-3 mb-10">
+                    <span class="material-symbols-outlined text-primary text-3xl">timer</span>
+                    <h2 class="text-3xl font-bold text-white">Universal Brewing Guides</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Guide Card 1 -->
+                    <div
+                        class="bg-surface-dark p-8 rounded-2xl border border-[#2d4724] hover:border-primary/40 transition-all group">
+                        <div
+                            class="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl">eco</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-4">Gongfu Cha Method</h3>
+                        <p class="text-text-muted text-sm leading-relaxed mb-6">The traditional Chinese style focusing
+                            on multiple short steepings to experience the flavor evolution.</p>
+                        <ul class="text-sm space-y-2 text-text-muted">
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 rounded-full bg-primary"></span> 100ml Vessel (Gaiwan)</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 rounded-full bg-primary"></span> 5-7g of Tea Leaves</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 rounded-full bg-primary"></span> 10-30s Infusions</li>
+                        </ul>
+                    </div>
+                    <!-- Guide Card 2 -->
+                    <div
+                        class="bg-surface-dark p-8 rounded-2xl border border-[#2d4724] hover:border-primary/40 transition-all group">
+                        <div
+                            class="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl">coffee</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-4">Western Style</h3>
+                        <p class="text-text-muted text-sm leading-relaxed mb-6">The everyday brewing method using larger
+                            vessels and longer steeping times for a full-bodied cup.</p>
+                        <ul class="text-sm space-y-2 text-text-muted">
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 rounded-full bg-primary"></span> 300-500ml Teapot</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 rounded-full bg-primary"></span> 3-5g of Tea Leaves</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 rounded-full bg-primary"></span> 3-5 Minute Infusion</li>
+                        </ul>
+                    </div>
+                    <!-- Guide Card 3 -->
+                    <div
+                        class="bg-surface-dark p-8 rounded-2xl border border-[#2d4724] hover:border-primary/40 transition-all group">
+                        <div
+                            class="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl">ac_unit</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-4">Cold Brewing</h3>
+                        <p class="text-text-muted text-sm leading-relaxed mb-6">Extract the natural sweetness without
+                            any bitterness by steeping in cold water over a long period.</p>
+                        <ul class="text-sm space-y-2 text-text-muted">
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 rounded-full bg-primary"></span> 1L Pitcher</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 rounded-full bg-primary"></span> 10-15g of Tea Leaves</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 rounded-full bg-primary"></span> 6-12h in Fridge</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Varieties Section -->
+        <section id="varieties" class="py-20 bg-surface-darker">
+            <div class="px-4 md:px-8 xl:px-40">
+                <div class="flex items-center gap-3 mb-10">
+                    <span class="material-symbols-outlined text-primary text-3xl">palette</span>
+                    <h2 class="text-3xl font-bold text-white">Tea Varieties & Oxidation</h2>
+                </div>
+                <div class="space-y-12">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div class="rounded-2xl overflow-hidden aspect-video bg-cover bg-center"
+                            style="background-image: url('assets/images/tea_oxidation_spectrum_v2_1772466192755.png')">
+                        </div>
+                        <div class="space-y-6">
+                            <h3 class="text-2xl font-bold text-white">Understanding Oxidation</h3>
+                            <p class="text-text-muted leading-relaxed">Most people don't realize that all tea—Green,
+                                Oolong, Black, and White—comes from the same plant: *Camellia Sinensis*. The difference
+                                lies in how much the leaf is allowed to "breathe" or oxidize after harvest.</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-background-dark p-4 rounded-xl border border-primary/10">
+                                    <p class="text-primary font-bold text-lg">0-5%</p>
+                                    <p class="text-white text-xs uppercase font-bold">Green Tea</p>
+                                </div>
+                                <div class="bg-background-dark p-4 rounded-xl border border-primary/10">
+                                    <p class="text-primary font-bold text-lg">15-85%</p>
+                                    <p class="text-white text-xs uppercase font-bold">Oolong Tea</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section id="history" class="py-20 bg-background-dark">
+            <div class="px-4 md:px-8 xl:px-40 max-w-4xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-white mb-4">A Brief History of Tea</h2>
+                    <div class="w-20 h-1 bg-primary mx-auto mb-6"></div>
+                    <p class="text-text-muted italic leading-relaxed">"Water is the mother of tea, a teapot its father,
+                        and fire the teacher." – Ancient Proverb</p>
+                </div>
+                <div class="space-y-12 border-l-2 border-[#2d4724] pl-8 relative ml-4">
+                    <div class="relative">
+                        <div
+                            class="absolute -left-[41px] top-1 size-4 rounded-full bg-primary border-4 border-background-dark">
+                        </div>
+                        <h4 class="text-white font-bold text-xl mb-2">2737 BC – The Discovery</h4>
+                        <p class="text-text-muted text-sm">Legend has it that the Chinese Emperor Shen Nong discovered
+                            tea when some wild leaves fell into his pot of boiling water.</p>
+                    </div>
+                    <div class="relative">
+                        <div
+                            class="absolute -left-[41px] top-1 size-4 rounded-full bg-primary border-4 border-background-dark">
+                        </div>
+                        <h4 class="text-white font-bold text-xl mb-2">618-907 AD – The Tang Dynasty</h4>
+                        <p class="text-text-muted text-sm">Tea became the national drink of China. Lu Yu wrote "The
+                            Classic of Tea", the first definitive book on the subject.</p>
+                    </div>
+                    <div class="relative">
+                        <div
+                            class="absolute -left-[41px] top-1 size-4 rounded-full bg-primary border-4 border-background-dark">
+                        </div>
+                        <h4 class="text-white font-bold text-xl mb-2">1610 – Arrival in Europe</h4>
+                        <p class="text-text-muted text-sm">The Dutch East India Company brought the first commercial
+                            shipment of tea to Europe, changing global trade forever.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer (Shared) -->
+    <footer class="bg-background-dark border-t border-[#2d4724] pt-16 pb-8">
+        <div class="px-4 md:px-8 xl:px-40">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                <div class="col-span-2 lg:col-span-2">
+                    <a class="flex items-center gap-2 text-white mb-4" href="index.html">
+                        <span class="material-symbols-outlined text-primary text-2xl">emoji_food_beverage</span>
+                        <span class="text-xl font-bold font-display uppercase tracking-tight">Tea Collective</span>
+                    </a>
+                    <p class="text-text-muted text-sm leading-relaxed max-w-sm">Dedicated to sourcing the finest teas
+                        from China's most historic terroirs.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Shop</h4>
+                    <ul class="space-y-2 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="index.html#products">Oolong</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="index.html#products">Puerh</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="index.html#products">Green Tea</a>
+                        </li>
+                        <li><a class="hover:text-primary transition-colors" href="index.html#products">White Tea</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">Support</h4>
+                    <ul class="space-y-2 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="support.html#shipping">Shipping &
+                                Returns</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="contact.html">Contact Us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="support.html#faq">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-[#2d4724] text-center text-xs text-text-muted">
+                &copy; 2024 Tea Collective. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        // --- Shared Logic (Cart & Auth) ---
+        const cartBadge = document.getElementById('cart-badge');
+        const cartDrawer = document.getElementById('cart-drawer');
+        const cartContent = cartDrawer.querySelector('.transform');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotalEl = document.getElementById('cart-total');
+        const authModal = document.getElementById('auth-modal');
+        const authContent = document.getElementById('auth-modal-content');
+        const loginBtn = document.getElementById('login-button');
+        const userProfile = document.getElementById('user-profile');
+        const authForm = document.getElementById('auth-form');
+        const authTabLogin = document.getElementById('tab-login');
+        const authTabRegister = document.getElementById('tab-register');
+        const authTitle = document.getElementById('auth-title');
+        const authSubtitle = document.getElementById('auth-subtitle');
+        const authSubmit = document.getElementById('auth-submit');
+        const authMessage = document.getElementById('auth-message');
+
+        let cart = JSON.parse(localStorage.getItem('tea-cart') || '[]');
+
+        function updateCartUI() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartBadge.textContent = count;
+            localStorage.setItem('tea-cart', JSON.stringify(cart));
+            renderCartItems();
+        }
+
+        function renderCartItems() {
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<div class="text-center py-12 text-text-muted"><p>Il carrello è vuoto</p></div>';
+                cartTotalEl.textContent = '$0.00';
+                return;
+            }
+            cartItemsContainer.innerHTML = cart.map(item => `
+                <div class="flex gap-4 bg-surface-darker/50 p-3 rounded-xl border border-[#2d4724]/50">
+                    <img src="${item.image_url}" class="size-16 rounded-lg object-cover bg-surface-dark" />
+                    <div class="flex-grow min-w-0">
+                        <h4 class="text-white font-bold truncate">${item.name}</h4>
+                        <div class="flex items-center justify-between mt-2">
+                            <div class="flex items-center gap-3 bg-surface-dark rounded-full px-2 py-1">
+                                <button onclick="changeQty('${item.id}', -1)" class="text-text-muted hover:text-primary"><span class="material-symbols-outlined text-sm">remove</span></button>
+                                <span class="text-white text-xs font-bold w-4 text-center">${item.quantity}</span>
+                                <button onclick="changeQty('${item.id}', 1)" class="text-text-muted hover:text-primary"><span class="material-symbols-outlined text-sm">add</span></button>
+                            </div>
+                            <span class="text-primary font-bold">$${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart('${item.id}')" class="text-text-muted hover:text-red-400"><span class="material-symbols-outlined text-sm">delete</span></button>
+                </div>
+            `).join('');
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotalEl.textContent = `$${total.toFixed(2)}`;
+        }
+
+        window.changeQty = (id, delta) => {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) cart = cart.filter(i => i.id !== id);
+                updateCartUI();
+            }
+        };
+        window.removeFromCart = (id) => {
+            cart = cart.filter(i => i.id !== id);
+            updateCartUI();
+        };
+
+        const openCart = () => { cartDrawer.classList.remove('hidden'); setTimeout(() => cartContent.style.transform = 'translateX(0)', 10); };
+        const closeCart = () => { cartContent.style.transform = 'translateX(100%)'; setTimeout(() => cartDrawer.classList.add('hidden'), 300); };
+
+        // Auth Shared Logic
+        let authMode = 'login';
+        const openAuth = () => { authModal.classList.remove('hidden'); setTimeout(() => authContent.classList.replace('scale-95', 'scale-100'), 10); authContent.classList.replace('opacity-0', 'opacity-100'); };
+        const closeAuth = () => { authContent.classList.replace('scale-100', 'scale-95'); authContent.classList.replace('opacity-100', 'opacity-0'); setTimeout(() => authModal.classList.add('hidden'), 300); };
+        const switchAuthMode = (mode) => {
+            authMode = mode;
+            if (mode === 'login') {
+                authTabLogin.className = "flex-grow py-2 rounded-md text-sm font-bold bg-primary text-background-dark";
+                authTabRegister.className = "flex-grow py-2 rounded-md text-sm font-bold text-text-muted hover:text-white";
+                authTitle.textContent = 'Bentornato'; authSubmit.textContent = 'Accedi';
+            } else {
+                authTabRegister.className = "flex-grow py-2 rounded-md text-sm font-bold bg-primary text-background-dark";
+                authTabLogin.className = "flex-grow py-2 rounded-md text-sm font-bold text-text-muted hover:text-white";
+                authTitle.textContent = 'Unisciti a noi'; authSubmit.textContent = 'Registrati';
+            }
+        };
+
+        // Listeners
+        document.getElementById('cart-button').addEventListener('click', openCart);
+        document.getElementById('close-cart').addEventListener('click', closeCart);
+        document.getElementById('cart-overlay').addEventListener('click', closeCart);
+        document.getElementById('login-button').addEventListener('click', openAuth);
+        document.getElementById('close-auth').addEventListener('click', closeAuth);
+        document.getElementById('auth-overlay').addEventListener('click', closeAuth);
+        authTabLogin.addEventListener('click', () => switchAuthMode('login'));
+        authTabRegister.addEventListener('click', () => switchAuthMode('register'));
+
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (session) { loginBtn.classList.add('hidden'); userProfile.classList.remove('hidden'); userProfile.classList.add('flex'); }
+            else { loginBtn.classList.remove('hidden'); userProfile.classList.add('hidden'); userProfile.classList.remove('flex'); }
+        });
+
+        document.getElementById('logout-button').addEventListener('click', () => supabase.auth.signOut());
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            authMessage.className = "mt-4 text-center text-sm block text-white";
+            authMessage.textContent = 'Processing...';
+            try {
+                if (authMode === 'login') {
+                    const { error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    closeAuth();
+                } else {
+                    const { error } = await supabase.auth.signUp({ email, password });
+                    if (error) throw error;
+                    authMessage.textContent = 'Check your email for confirmation!';
+                }
+            } catch (err) { authMessage.textContent = err.message; authMessage.classList.add('text-red-400'); }
+        });
+
+        // Init
+        updateCartUI();
+    </script>
+</body>
+
+</html>

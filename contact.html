@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Contact Us - Tea Collective</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#4ce619", "background-dark": "#152111", "surface-dark": "#1d2b19", "text-muted": "#a0c893" },
+                    fontFamily: { "display": ["Manrope", "sans-serif"] },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-background-dark text-white antialiased min-h-screen flex flex-col font-display">
+    <!-- Header (Shared) -->
+    <header class="sticky top-0 z-50 w-full border-b border-[#2d4724]/50 bg-background-dark/80 backdrop-blur-md">
+        <div class="px-4 md:px-8 xl:px-40 py-3 flex justify-between items-center text-center">
+            <a class="flex items-center gap-3 transition-transform hover:scale-105" href="index.html">
+                <span class="material-symbols-outlined !text-3xl text-primary">emoji_food_beverage</span>
+                <span class="text-xl font-bold tracking-tight">Tea Collective</span>
+            </a>
+            <nav class="hidden lg:flex items-center gap-8">
+                <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                    href="index.html#products">Shop Teas</a>
+                <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                    href="education.html">Education</a>
+                <a class="text-text-muted hover:text-primary text-sm font-medium transition-colors"
+                    href="sourcing.html">Sourcing</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <button id="login-button" class="text-white hover:text-primary text-sm font-bold">Login</button>
+                <div id="user-profile" class="hidden items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">person</span>
+                    <button id="logout-button" class="text-text-muted hover:text-red-400 text-xs">Logout</button>
+                </div>
+                <button id="cart-button"
+                    class="relative size-10 rounded-full bg-surface-dark flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                    <span id="cart-badge"
+                        class="absolute -top-1 -right-1 bg-primary text-background-dark text-[10px] font-bold rounded-full size-4 flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main
+        class="flex-grow flex items-center justify-center py-20 bg-[url('https://images.unsplash.com/photo-1594631252845-29fc4586c56c?auto=format&fit=crop&q=80')] bg-cover bg-fixed">
+        <div class="absolute inset-0 bg-background-dark/80 backdrop-blur-sm"></div>
+
+        <div class="relative z-10 w-full max-w-5xl px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <!-- Contact Info -->
+            <div class="space-y-8">
+                <h1 class="text-5xl font-black text-white">Let's Talk Tea.</h1>
+                <p class="text-text-muted text-lg leading-relaxed">Whether you have questions about a specific batch,
+                    need brewing advice, or just want to say hello, we're here for you.</p>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4">
+                        <div class="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined">mail</span>
+                        </div>
+                        <div>
+                            <p class="text-xs uppercase font-bold text-primary tracking-widest">Email Us</p>
+                            <p class="text-white font-medium">hello@teacollective.com</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined">location_on</span>
+                        </div>
+                        <div>
+                            <p class="text-xs uppercase font-bold text-primary tracking-widest">Global HQ</p>
+                            <p class="text-white font-medium">Berlin, Germany</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="bg-surface-dark/60 backdrop-blur-xl border border-[#2d4724]/50 p-8 rounded-3xl shadow-2xl">
+                <form id="contact-form" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase text-primary/70 ml-1">Your Name</label>
+                            <input type="text" required
+                                class="w-full bg-background-dark/50 border border-[#2d4724] rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase text-primary/70 ml-1">Email Address</label>
+                            <input type="email" required
+                                class="w-full bg-background-dark/50 border border-[#2d4724] rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase text-primary/70 ml-1">How can we help?</label>
+                        <select
+                            class="w-full bg-background-dark/50 border border-[#2d4724] rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                            <option>Order Support</option>
+                            <option>Brewing Advice</option>
+                            <option>Wholesale Inquiries</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase text-primary/70 ml-1">Message</label>
+                        <textarea rows="4" required
+                            class="w-full bg-background-dark/50 border border-[#2d4724] rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none"
+                            placeholder="What's on your mind?"></textarea>
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-primary hover:bg-primary/90 text-background-dark font-black py-4 rounded-xl transition-all shadow-[0_0_30px_rgba(76,230,25,0.2)] active:scale-[0.98]">
+                        Send Message
+                    </button>
+                    <div id="form-status" class="hidden text-center text-sm font-bold text-primary mt-4">Message sent
+                        successfully!</div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        const cartBadge = document.getElementById('cart-badge');
+        const loginBtn = document.getElementById('login-button');
+        const userProfile = document.getElementById('user-profile');
+        let cart = JSON.parse(localStorage.getItem('tea-cart') || '[]');
+        cartBadge.textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (session) { loginBtn.classList.add('hidden'); userProfile.classList.replace('hidden', 'flex'); }
+            else { loginBtn.classList.remove('hidden'); userProfile.classList.replace('flex', 'hidden'); }
+        });
+        document.getElementById('logout-button').onclick = () => supabase.auth.signOut();
+        document.getElementById('contact-form').onsubmit = (e) => {
+            e.preventDefault();
+            document.getElementById('form-status').classList.remove('hidden');
+            e.target.reset();
+        }
+    </script>
+</body>
+
+</html>
